@@ -1,0 +1,1873 @@
+#include <iostream.h>
+#include <fstream.h>
+#include <conio.h>
+#include <stdio.h>
+/* Input format: To input R2 U2 B', enter
+R
+R
+U
+U
+b
+0
+*/
+//Orientation is white bottom green front for scrambling and solving.
+//face 0-yellow
+//face 1-white
+//face 2-blue
+//face 3-green
+//face 4-orange
+//face 5-red
+char faces[6][9];
+char solution[100]={'0'};
+int start=0;
+int last=0;
+void write_solution()
+{
+  ofstream ofile("Solution.txt",ios::out);
+  if(!ofile)
+  {
+    cout<<"ERROR";
+    return;
+  }
+  for(int f=0;f<last;f++)
+  {
+    ofile<<solution[f];
+  }
+  ofile.close();
+}
+
+void disp_file()
+{
+  ifstream ifile;
+  char ch;
+  ifile.open("Solution.txt");
+  if(!ifile)
+  {
+    cout<<"ERROR 1";
+    return;
+  }
+  while(ifile>>ch)
+  {
+    cout<<ch<<" ";
+  }
+  ifile.close();
+}
+
+void disp_scramble()
+{
+  ifstream ifile1("Scramble.txt");
+  char c;
+  cout<<"Scramble:";
+  while(ifile1>>c)
+  {
+      cout<<c<<" ";
+  }
+  ifile1.close();
+}
+
+void Solvedstate()
+{
+   int i=0;
+   for (i=0;i<9;i++)
+   {
+     faces[0][i]='y';
+     faces[1][i]='w';
+     faces[2][i]='b';
+     faces[3][i]='g';
+     faces[4][i]='o';
+     faces[5][i]='r';
+   }
+}
+
+
+void swap(int i,int j,int k,int l)
+{
+  char temp=faces[i][j];
+  faces[i][j]=faces[k][l];
+  faces[k][l]=temp;
+}
+
+
+void current_state()
+{
+  int i=0,j=0;
+  for(i=0;i<6;i++)
+  {
+    if(i==0) cout<<"Yellow side:";
+    else if(i==1) cout<<"White side:";
+    else if(i==2) cout<<"Blue side:";
+    else if(i==3) cout<<"Green side:";
+    else if(i==4) cout<<"Orange side:";
+    else cout<<"Red side:";
+    for(j=0;j<9;j++)
+    {
+      cout<<faces[i][j]<<' ';
+    }
+    cout<<'\n';
+  }
+}
+
+
+void move(char move)
+{
+  int i=0;
+  switch(move)
+  {
+    case 'R': //front sticker
+	      swap(3,2,1,2);
+	      swap(1,2,2,6);
+	      swap(2,6,0,2);
+	      //top sticker
+	      swap(0,8,3,8);
+	      swap(3,8,1,8);
+	      swap(1,8,2,0);
+	      //side sticker
+	      swap(4,0,4,6);
+	      swap(4,6,4,8);
+	      swap(4,8,4,2);
+	      //edge-top
+	      swap(0,5,3,5);
+	      swap(3,5,1,5);
+	      swap(1,5,2,3);
+	      //edge-side
+	      swap(4,1,4,3);
+	      swap(4,3,4,7);
+	      swap(4,7,4,5);
+	      break;
+
+    case 'r': for(i=0;i<3;i++)
+	      {
+		//front sticker
+                swap(3,2,1,2);
+                swap(1,2,2,6);
+                swap(2,6,0,2);
+                //top sticker
+                swap(0,8,3,8);
+		swap(3,8,1,8);
+		swap(1,8,2,0);
+                //side sticker
+		swap(4,0,4,6);
+                swap(4,6,4,8);
+                swap(4,8,4,2);
+		//edge-top
+		swap(0,5,3,5);
+                swap(3,5,1,5);
+                swap(1,5,2,3);
+                //edge-side
+                swap(4,1,4,3);
+                swap(4,3,4,7);
+		swap(4,7,4,5);
+	      }
+              break;
+
+    case 'L': //front-sticker
+              swap(3,0,0,0);
+	      swap(0,0,2,8);
+	      swap(2,8,1,0);
+              //top-sticker
+              swap(0,6,2,2);
+              swap(2,2,1,6);
+              swap(1,6,3,6);
+              //side-sticker
+	      swap(5,2,5,0);
+	      swap(5,0,5,6);
+              swap(5,6,5,8);
+	      //edge-top
+              swap(3,3,0,3);
+              swap(0,3,2,5);
+	      swap(2,5,1,3);
+	      //edge-side
+              swap(5,5,5,1);
+              swap(5,1,5,3);
+              swap(5,3,5,7);
+              break;
+
+    case 'l': for(i=0;i<3;i++)
+	      {
+                //front-sticker
+		swap(3,0,0,0);
+                swap(0,0,2,8);
+                swap(2,8,1,0);
+		//top-sticker
+		swap(0,6,2,2);
+                swap(2,2,1,6);
+                swap(1,6,3,6);
+                //side-sticker
+                swap(5,2,5,0);
+                swap(5,0,5,6);
+		swap(5,6,5,8);
+		//edge-top
+                swap(3,3,0,3);
+		swap(0,3,2,5);
+                swap(2,5,1,3);
+                //edge-side
+		swap(5,5,5,1);
+		swap(5,1,5,3);
+                swap(5,3,5,7);
+
+              }
+              break;
+
+    case 'U': //front-sticker
+	      swap(3,2,4,2);
+              swap(4,2,2,2);
+	      swap(2,2,5,2);
+              //top-sticker
+              swap(0,8,0,2);
+	      swap(0,2,0,0);
+	      swap(0,0,0,6);
+              //side-sticker
+              swap(4,0,2,0);
+              swap(2,0,5,0);
+              swap(5,0,3,0);
+              //edge-top
+	      swap(0,5,0,1);
+	      swap(0,1,0,3);
+              swap(0,3,0,7);
+	      //edge-side
+              swap(3,1,4,1);
+              swap(4,1,2,1);
+	      swap(2,1,5,1);
+	      break;
+
+    case 'u': for(i=0;i<3;i++)
+              {
+                //front-sticker
+                swap(3,2,4,2);
+		swap(4,2,2,2);
+		swap(2,2,5,2);
+                //top-sticker
+		swap(0,8,0,2);
+                swap(0,2,0,0);
+                swap(0,0,0,6);
+		//side-sticker
+		swap(4,0,2,0);
+                swap(2,0,5,0);
+                swap(5,0,3,0);
+                //edge-top
+                swap(0,5,0,1);
+                swap(0,1,0,3);
+		swap(0,3,0,7);
+		//edge-side
+		swap(3,1,4,1);
+		swap(4,1,2,1);
+		swap(2,1,5,1);
+	      }
+	      break;
+
+    case 'D': //front-sticker
+	      swap(3,8,5,8);
+	      swap(5,8,2,8);
+	      swap(2,8,4,8);
+	      //bottom-sticker
+	      swap(1,2,1,0);
+	      swap(1,0,1,6);
+	      swap(1,6,1,8);
+	      //side-sticker
+	      swap(4,6,3,6);
+	      swap(3,6,5,6);
+	      swap(5,6,2,6);
+	      //edge-bottom
+	      swap(1,1,1,3);
+	      swap(1,3,1,7);
+	      swap(1,7,1,5);
+	      //edge-front
+	      swap(3,7,5,7);
+	      swap(5,7,2,7);
+	      swap(2,7,4,7);
+	      break;
+
+    case 'd': for(i=0;i<3;i++)
+	      {
+		//front-sticker
+		swap(3,8,5,8);
+		swap(5,8,2,8);
+		swap(2,8,4,8);
+		//bottom-sticker
+		swap(1,2,1,0);
+		swap(1,0,1,6);
+		swap(1,6,1,8);
+		//side-sticker
+		swap(4,6,3,6);
+		swap(3,6,5,6);
+		swap(5,6,2,6);
+		//edge-bottom
+		swap(1,1,1,3);
+		swap(1,3,1,7);
+		swap(1,7,1,5);
+		//edge-front
+		swap(3,7,5,7);
+		swap(5,7,2,7);
+		swap(2,7,4,7);
+	      }
+	      break;
+
+    case 'F': //front-sticker
+	      swap(3,2,3,0);
+	      swap(3,0,3,6);
+	      swap(3,6,3,8);
+	      //side-sticker
+	      swap(4,0,0,6);
+	      swap(0,6,5,8);
+	      swap(5,8,1,2);
+	      //top-sticker
+	      swap(0,8,5,2);
+	      swap(5,2,1,0);
+	      swap(1,0,4,6);
+	      //edge-top
+	      swap(0,7,5,5);
+	      swap(5,5,1,1);
+	      swap(1,1,4,3);
+	      //edge-front
+	      swap(3,1,3,3);
+	      swap(3,3,3,7);
+	      swap(3,7,3,5);
+	      break;
+
+    case 'f': for(i=0;i<3;i++)
+	      {
+		//front-sticker
+		  swap(3,2,3,0);
+		  swap(3,0,3,6);
+		  swap(3,6,3,8);
+		  //side-sticker
+		  swap(4,0,0,6);
+		  swap(0,6,5,8);
+		  swap(5,8,1,2);
+		  //top-sticker
+		  swap(0,8,5,2);
+		  swap(5,2,1,0);
+		  swap(1,0,4,6);
+		  //edge-top
+		  swap(0,7,5,5);
+		  swap(5,5,1,1);
+		  swap(1,1,4,3);
+		  //edge-front
+		  swap(3,1,3,3);
+		  swap(3,3,3,7);
+		  swap(3,7,3,5);
+	      }
+	      break;
+
+    case 'B': //top-sticker
+	      swap(0,2,4,8);
+	      swap(4,8,1,6);
+	      swap(1,6,5,0);
+	      //back-sticker
+	      swap(2,0,2,6);
+	      swap(2,6,2,8);
+	      swap(2,8,2,2);
+	      //side-sticker
+	      swap(4,2,1,8);
+	      swap(1,8,5,6);
+	      swap(5,6,0,0);
+	      //edge-top
+	      swap(0,1,4,5);
+	      swap(4,5,1,7);
+	      swap(1,7,5,3);
+	      //edge-back
+	      swap(2,1,2,3);
+	      swap(2,3,2,7);
+	      swap(2,7,2,5);
+	      break;
+
+    case 'b': for(i=0;i<3;i++)
+	      {
+		//top-sticker
+		swap(0,2,4,8);
+		swap(4,8,1,6);
+		swap(1,6,5,0);
+		//back-sticker
+		swap(2,0,2,6);
+		swap(2,6,2,8);
+		swap(2,8,2,2);
+		//side-sticker
+		swap(4,2,1,8);
+		swap(1,8,5,6);
+		swap(5,6,0,0);
+		//edge-top
+		swap(0,1,4,5);
+		swap(4,5,1,7);
+		swap(1,7,5,3);
+		//edge-back
+		swap(2,1,2,3);
+		swap(2,3,2,7);
+		swap(2,7,2,5);
+	      }
+	      break;
+  }
+}
+
+
+void scramble()
+{
+  ofstream scramble("Scramble.txt");
+  char input;
+  Solvedstate();
+  do
+  {
+      cin>>input;
+      move(input);
+      scramble<<input<<" ";
+
+  } while(input!='0');
+  //current_state();
+  scramble.close();
+}
+//face 0-yellow
+//face 1-white
+//face 2-blue
+//face 3-green
+//face 4-orange
+//face 5-red
+
+void Cross()
+{
+  int i=0,pieces=0,j=0,flagG=0,flagB=0,flagR=0,flagO=0;
+  if(faces[1][1]=='w' && faces[3][7]=='g')
+  {
+    pieces++;
+    flagG++;
+  }
+  if(faces[1][5]=='w' && faces[4][7]=='o')
+  {
+    pieces++;
+    flagO++;
+  }
+  if(faces[1][3]=='w' && faces[5][7]=='r')
+  {
+    pieces++;
+    flagR++;
+  }
+  if(faces[1][7]=='w' && faces[2][7]=='b')
+  {
+    pieces++;
+    flagB++;
+  }
+  while(pieces<4)
+  {
+    start=i;
+    last=i;
+
+    //white on yellow side
+    if(faces[0][1]=='w')
+    {
+      if(faces[2][1]=='g')
+      {
+	solution[i++]='U';
+	solution[i++]='U';
+	solution[i++]='F';
+	solution[i++]='F';
+      }
+      else if(faces[2][1]=='r')
+      {
+	solution[i++]='u';
+	solution[i++]='L';
+	solution[i++]='L';
+      }
+      else if(faces[2][1]=='o')
+      {
+	solution[i++]='U';
+	solution[i++]='R';
+	solution[i++]='R';
+      }
+      else if(faces[2][1]=='b')
+      {
+	solution[i++]='B';
+	solution[i++]='B';
+      }
+      pieces++;
+      last=i;
+      for(j=start;j<last;j++)
+      {
+	move(solution[j]);
+      }
+      start=last;
+      if(pieces>=4) break;
+      continue;
+    }
+    if(faces[0][3]=='w')
+    {
+      if(faces[5][1]=='r')
+      {
+	solution[i++]='L';
+	solution[i++]='L';
+      }
+      else if(faces[5][1]=='o')
+      {
+	solution[i++]='U';
+	solution[i++]='U';
+	solution[i++]='R';
+	solution[i++]='R';
+      }
+      else if(faces[5][1]=='g')
+      {
+	solution[i++]='u';
+	solution[i++]='F';
+	solution[i++]='F';
+      }
+      else if(faces[5][1]=='b')
+      {
+	solution[i++]='U';
+	solution[i++]='B';
+	solution[i++]='B';
+      }
+      pieces++;
+      last=i;
+      for(j=start;j<last;j++)
+      {
+	move(solution[j]);
+      }
+      start=last;
+      if(pieces>=4) break;
+      continue;
+    }
+    if(faces[0][5]=='w')
+    {
+      if(faces[4][1]=='o')
+      {
+	solution[i++]='R';
+	solution[i++]='R';
+      }
+      else if(faces[4][1]=='r')
+      {
+	solution[i++]='U';
+	solution[i++]='U';
+	solution[i++]='L';
+	solution[i++]='L';
+      }
+      else if(faces[4][1]=='g')
+      {
+	solution[i++]='U';
+	solution[i++]='F';
+	solution[i++]='F';
+      }
+      else if(faces[4][1]=='b')
+      {
+	solution[i++]='u';
+	solution[i++]='B';
+	solution[i++]='B';
+      }
+      pieces++;
+      last=i;
+      for(j=start;j<last;j++)
+      {
+	move(solution[j]);
+      }
+      start=last;
+      if(pieces>=4) break;
+      continue;
+    }
+    if(faces[0][7]=='w')
+    {
+      if(faces[3][1]=='g')
+      {
+	solution[i++]='F';
+	solution[i++]='F';
+      }
+      else if(faces[3][1]=='b')
+      {
+	solution[i++]='U';
+	solution[i++]='U';
+	solution[i++]='B';
+	solution[i++]='B';
+      }
+      else if(faces[3][1]=='r')
+      {
+	solution[i++]='U';
+	solution[i++]='L';
+	solution[i++]='L';
+      }
+      else if(faces[3][1]=='o')
+      {
+	solution[i++]='u';
+	solution[i++]='R';
+	solution[i++]='R';
+      }
+      pieces++;
+      last=i;
+      for(j=start;j<last;j++)
+      {
+	move(solution[j]);
+      }
+      start=last;
+      if(pieces>=4) break;
+      continue;
+    }
+
+
+    //white on green side
+    if(faces[3][1]=='w')
+    {
+      if(faces[0][7]=='g')
+      {
+	  if(faces[1][5]!='w')
+	  {
+	    solution[i++]='u';
+	    solution[i++]='r';
+	    solution[i++]='F';
+	  }
+	  else if(faces[1][3]!='w')
+	  {
+	    solution[i++]='u';
+	    solution[i++]='L';
+	    solution[i++]='F';
+	  }
+	  else
+	  {
+	    solution[i++]='R';
+	    solution[i++]='u';
+	    solution[i++]='r';
+	    solution[i++]='F';
+	  }
+      }
+      else if(faces[0][7]=='b')
+      {
+	 if(faces[1][5]!='w')
+	 {
+	   solution[i++]='u';
+	   solution[i++]='R';
+	   solution[i++]='b';
+	 }
+	 else if(faces[1][3]!='w')
+	 {
+	   solution[i++]='U';
+	   solution[i++]='l';
+	   solution[i++]='B';
+	 }
+	 else
+	 {
+	   solution[i++]='r';
+	   solution[i++]='u';
+	   solution[i++]='R';
+	   solution[i++]='b';
+	 }
+      }
+      else if(faces[0][7]=='r')
+      {
+	  if(faces[1][1]!='w')
+	  {
+	    solution[i++]='f';
+	    solution[i++]='L';
+	  }
+	  else
+	  {
+	    solution[i++]='f';
+	    solution[i++]='L';
+	    solution[i++]='F';
+	  }
+      }
+      else if(faces[0][7]=='o')
+      {
+	  if(faces[1][1]!='w')
+	  {
+	   solution[i++]='F';
+	   solution[i++]='r';
+	  }
+	  else
+	  {
+	    solution[i++]='F';
+	    solution[i++]='r';
+	    solution[i++]='f';
+	  }
+      }
+      pieces++;
+      last=i;
+      for(j=start;j<last;j++)
+      {
+	move(solution[j]);
+      }
+      start=last;
+      if(pieces>=4) break;
+      continue;
+    }
+    if(faces[3][3]=='w')
+    {
+      if(faces[5][5]=='r')
+      {
+	solution[i++]='L';
+      }
+      else if(faces[5][5]=='o')
+      {
+	if(faces[1][1]!='w')
+	{
+	  solution[i++]='F';
+	  solution[i++]='F';
+	  solution[i++]='r';
+	}
+	else
+	{
+	  solution[i++]='F';
+	  solution[i++]='F';
+	  solution[i++]='r';
+	  solution[i++]='F';
+	  solution[i++]='F';
+	}
+      }
+      else if(faces[5][5]=='g')
+      {
+	if(pieces==0)
+	{
+	  solution[i++]='L';
+	  solution[i++]='D';
+	}
+	else
+	{
+	  solution[i++]='d';
+	  solution[i++]='L';
+	  solution[i++]='D';
+	}
+      }
+      else if(faces[5][5]=='b')
+      {
+	if(pieces==0)
+	{
+	  solution[i++]='L';
+	  solution[i++]='d';
+	}
+	else
+	{
+	  solution[i++]='D';
+	  solution[i++]='L';
+	  solution[i++]='d';
+	}
+      }
+      pieces++;
+      last=i;
+      for(j=start;j<last;j++)
+      {
+	move(solution[j]);
+      }
+      start=last;
+      if(pieces>=4) break;
+      continue;
+    }
+    if(faces[3][5]=='w')
+    {
+      if(faces[4][3]=='o')
+      {
+	solution[i++]='r';
+      }
+      else if(faces[4][3]=='r')
+      {
+	if(faces[1][1]!='w')
+	{
+	  solution[i++]='F';
+	  solution[i++]='F';
+	  solution[i++]='L';
+	}
+	else
+	{
+	    solution[i++]='F';
+	    solution[i++]='F';
+	    solution[i++]='L';
+	    solution[i++]='F';
+	    solution[i++]='F';
+	}
+      }
+      else if(faces[4][3]=='g')
+      {
+	if(pieces==0)
+	{
+	  solution[i++]='r';
+	  solution[i++]='d';
+	}
+	else
+	{
+	  solution[i++]='D';
+	  solution[i++]='r';
+	  solution[i++]='d';
+	}
+      }
+      else if(faces[4][3]=='b')
+      {
+	if(pieces==0)
+	{
+	  solution[i++]='r';
+	  solution[i++]='D';
+	}
+	else
+	{
+	  solution[i++]='d';
+	  solution[i++]='r';
+	  solution[i++]='D';
+	}
+      }
+      pieces++;
+      last=i;
+      for(j=start;j<last;j++)
+      {
+	move(solution[j]);
+      }
+      start=last;
+      if(pieces>=4) break;
+      continue;
+    }
+    if(faces[3][7]=='w')
+    {
+      if(faces[1][1]=='g')
+      {
+	if(pieces==0)
+	{
+	  solution[i++]='D';
+	  solution[i++]='R';
+	  solution[i++]='F';
+	}
+	else
+	{
+	  solution[i++]='f';
+	  solution[i++]='D';
+	  solution[i++]='r';
+	  solution[i++]='d';
+	}
+      }
+      else if(faces[1][1]=='b')
+      {
+	if(pieces==0)
+	{
+	  solution[i++]='f';
+	  solution[i++]='r';
+	  solution[i++]='D';
+	}
+	else
+	{
+	  solution[i++]='f';
+	  solution[i++]='d';
+	  solution[i++]='r';
+	  solution[i++]='D';
+	}
+      }
+      else if(faces[1][1]=='r')
+      {
+	solution[i++]='F';
+	solution[i++]='L';
+      }
+      else if(faces[1][1]=='o')
+      {
+	solution[i++]='f';
+	solution[i++]='r';
+      }
+      pieces++;
+      last=i;
+      for(j=start;j<last;j++)
+      {
+	move(solution[j]);
+      }
+      start=last;
+      if(pieces>=4) break;
+      continue;
+    }
+
+
+    //white on blue side
+    if(faces[2][7]=='w')
+    {
+      if(faces[1][7]=='b')
+      {
+	if(pieces==0)
+	{
+	  solution[i++]='d';
+	  solution[i++]='r';
+	  solution[i++]='b';
+	}
+	else
+	{
+	  solution[i++]='B';
+	  solution[i++]='d';
+	  solution[i++]='R';
+	  solution[i++]='D';
+	}
+      }
+      else if(faces[1][7]=='g')
+      {
+	if(pieces==0)
+	{
+	  solution[i++]='d';
+	  solution[i++]='R';
+	  solution[i++]='F';
+	}
+	else
+	{
+	  solution[i++]='B';
+	  solution[i++]='D';
+	  solution[i++]='R';
+	  solution[i++]='d';
+	}
+      }
+      else if(faces[1][7]=='r')
+      {
+	solution[i++]='b';
+	solution[i++]='l';
+      }
+      else if(faces[1][7]=='o')
+      {
+	solution[i++]='B';
+	solution[i++]='R';
+      }
+      pieces++;
+      last=i;
+      for(j=start;j<last;j++)
+      {
+	move(solution[j]);
+      }
+      start=last;
+      if(pieces>=4) break;
+      continue;
+    }
+    if(faces[2][3]=='w')
+    {
+      if(faces[4][5]=='o')
+      {
+	solution[i++]='R';
+      }
+      else if(faces[4][5]=='r')
+      {
+	if(faces[1][7]!='w')
+	{
+	  solution[i++]='B';
+	  solution[i++]='B';
+	  solution[i++]='l';
+	}
+	else
+	{
+	  solution[i++]='B';
+	  solution[i++]='B';
+	  solution[i++]='l';
+	  solution[i++]='B';
+	  solution[i++]='B';
+	}
+      }
+      else if(faces[4][5]=='g')
+      {
+	  solution[i++]='D';
+	  solution[i++]='R';
+	  solution[i++]='d';
+      }
+      else if(faces[4][5]=='b')
+      {
+	solution[i++]='d';
+	solution[i++]='R';
+	solution[i++]='D';
+      }
+      pieces++;
+      last=i;
+      for(j=start;j<last;j++)
+      {
+	move(solution[j]);
+      }
+      start=last;
+      if(pieces>=4) break;
+      continue;
+    }
+    if(faces[2][5]=='w')
+    {
+      if(faces[5][3]=='r')
+      {
+	solution[i++]='l';
+      }
+      else if(faces[5][3]=='o')
+      {
+	if(faces[1][7]!='w')
+	{
+	  solution[i++]='B';
+	  solution[i++]='B';
+	  solution[i++]='R';
+	}
+	else
+	{
+	  solution[i++]='B';
+	  solution[i++]='B';
+	  solution[i++]='R';
+	  solution[i++]='B';
+	  solution[i++]='B';
+	}
+      }
+      else if(faces[5][3]=='b')
+      {
+	if(pieces==0)
+	{
+	  solution[i++]='l';
+	  solution[i++]='d';
+	}
+	else
+	{
+	  solution[i++]='D';
+	  solution[i++]='l';
+	  solution[i++]='d';
+	}
+      }
+      else if(faces[5][3]=='g')
+      {
+	  if(pieces==0)
+	  {
+	    solution[i++]='l';
+	    solution[i++]='D';
+	  }
+	  else
+	  {
+	    solution[i++]='d';
+	    solution[i++]='l';
+	    solution[i++]='D';
+	  }
+      }
+      pieces++;
+      last=i;
+      for(j=start;j<last;j++)
+      {
+	move(solution[j]);
+      }
+      start=last;
+      if(pieces>=4) break;
+      continue;
+    }
+    if(faces[2][1]=='w')
+    {
+      if(faces[0][1]=='b')
+      {
+	if(pieces==0)
+	{
+	  solution[i++]='B';
+	  solution[i++]='l';
+	  solution[i++]='d';
+	}
+	else
+	{
+	  solution[i++]='L';
+	  solution[i++]='u';
+	  solution[i++]='l';
+	  solution[i++]='B';
+	}
+      }
+      else if(faces[0][1]=='g')
+      {
+	if(faces[1][3]!='w')
+	{
+	  solution[i++]='u';
+	  solution[i++]='L';
+	  solution[i++]='f';
+	}
+	else
+	{
+	    solution[i++]='l';
+	    solution[i++]='u';
+	    solution[i++]='L';
+	    solution[i++]='f';
+	}
+      }
+      else if(faces[0][1]=='r')
+      {
+	if(faces[1][7]!='w')
+	{
+	  solution[i++]='B';
+	  solution[i++]='l';
+	}
+	else
+	{
+	  solution[i++]='B';
+	  solution[i++]='l';
+	  solution[i++]='b';
+	}
+      }
+      else if(faces[0][1]=='o')
+      {
+	if(faces[1][7]!='w')
+	{
+	  solution[i++]='b';
+	  solution[i++]='R';
+	}
+	else
+	{
+	    solution[i++]='b';
+	    solution[i++]='R';
+	    solution[i++]='B';
+	}
+      }
+      pieces++;
+      last=i;
+      for(j=start;j<last;j++)
+      {
+	move(solution[j]);
+      }
+      start=last;
+      if(pieces>=4) break;
+      continue;
+    }
+
+
+    //white on orange side
+    if(faces[4][1]=='w')
+    {
+      if(faces[0][5]=='o')
+      {
+	if(faces[1][1]!='w')
+	{
+	  solution[i++]='U';
+	  solution[i++]='F';
+	  solution[i++]='r';
+	}
+	else if(faces[1][7]!='w')
+	{
+	  solution[i++]='u';
+	  solution[i++]='b';
+	  solution[i++]='R';
+	}
+	else
+	{
+	  solution[i++]='U';
+	  solution[i++]='F';
+	  solution[i++]='r';
+	  solution[i++]='f';
+	}
+      }
+      else if(faces[0][5]=='r')
+      {
+	  if(faces[1][1]!='w')
+	  {
+	      solution[i++]='U';
+	      solution[i++]='f';
+	      solution[i++]='L';
+	  }
+	  else
+	  {
+	      solution[i++]='U';
+	      solution[i++]='f';
+	      solution[i++]='L';
+	      solution[i++]='F';
+	  }
+      }
+      else if(faces[0][5]=='b')
+      {
+	if(faces[1][5]!='w')
+	{
+	  solution[i++]='R';
+	  solution[i++]='b';
+	}
+	else
+	{
+	  solution[i++]='R';
+	  solution[i++]='b';
+	  solution[i++]='r';
+	}
+      }
+      else if(faces[0][5]=='g')
+      {
+	if(faces[1][5]!='w')
+	{
+	  solution[i++]='r';
+	  solution[i++]='F';
+	}
+	else
+	{
+	  solution[i++]='r';
+	  solution[i++]='F';
+	  solution[i++]='R';
+	}
+      }
+      pieces++;
+      last=i;
+      for(j=start;j<last;j++)
+      {
+	move(solution[j]);
+      }
+      start=last;
+      if(pieces>=4) break;
+      continue;
+    }
+    if(faces[4][3]=='w')
+    {
+      if(faces[3][5]=='g')
+      {
+	solution[i++]='F';
+      }
+      else if(faces[3][5]=='b')
+      {
+	if(faces[1][5]!='w')
+	{
+	  solution[i++]='R';
+	  solution[i++]='R';
+	  solution[i++]='b';
+	}
+	else
+	{
+	  solution[i++]='R';
+	  solution[i++]='R';
+	  solution[i++]='b';
+	  solution[i++]='R';
+	  solution[i++]='R';
+	}
+      }
+      else if(faces[3][5]=='r')
+      {
+	if(pieces==0)
+	{
+	  solution[i++]='F';
+	  solution[i++]='d';
+	}
+	else
+	{
+	  solution[i++]='D';
+	  solution[i++]='F';
+	  solution[i++]='d';
+	}
+      }
+      else if(faces[3][5]=='o')
+      {
+	if(pieces==0)
+	{
+	  solution[i++]='F';
+	  solution[i++]='D';
+	}
+	else
+	{
+	  solution[i++]='d';
+	  solution[i++]='F';
+	  solution[i++]='D';
+	}
+      }
+      pieces++;
+      last=i;
+      for(j=start;j<last;j++)
+      {
+	move(solution[j]);
+      }
+      start=last;
+      if(pieces>=4) break;
+      continue;
+    }
+    if(faces[4][5]=='w')
+    {
+      if(faces[2][3]=='b')
+      {
+	solution[i++]='b';
+      }
+      else if(faces[2][3]=='g')
+      {
+	if(faces[1][5]!='w')
+	{
+	  solution[i++]='R';
+	  solution[i++]='R';
+	  solution[i++]='F';
+	}
+	else
+	{
+	  solution[i++]='R';
+	  solution[i++]='R';
+	  solution[i++]='F';
+	  solution[i++]='R';
+	  solution[i++]='R';
+	}
+      }
+      else if(faces[2][3]=='r')
+      {
+	if(pieces==0)
+	{
+	  solution[i++]='b';
+	  solution[i++]='D';
+	}
+	else
+	{
+	  solution[i++]='d';
+	  solution[i++]='b';
+	  solution[i++]='D';
+	}
+      }
+      else if(faces[2][3]=='o')
+      {
+	  if(pieces==0)
+	  {
+	    solution[i++]='b';
+	    solution[i++]='d';
+	  }
+	  else
+	  {
+	    solution[i++]='D';
+	    solution[i++]='b';
+	    solution[i++]='d';
+	  }
+      }
+      pieces++;
+      last=i;
+      for(j=start;j<last;j++)
+      {
+	move(solution[j]);
+      }
+      start=last;
+      if(pieces>=4) break;
+      continue;
+    }
+    if(faces[4][7]=='w')
+    {
+      if(faces[1][5]=='g')
+      {
+	solution[i++]='R';
+	solution[i++]='F';
+      }
+      else if(faces[1][5]=='b')
+      {
+	solution[i++]='r';
+	solution[i++]='b';
+      }
+      else if(faces[1][5]=='r')
+      {
+	if(pieces==0)
+	{
+	  solution[i++]='d';
+	  solution[i++]='F';
+	  solution[i++]='L';
+	}
+	else
+	{
+	  solution[i++]='R';
+	  solution[i++]='D';
+	  solution[i++]='F';
+	  solution[i++]='d';
+	}
+      }
+      else if(faces[1][5]=='o')
+      {
+	if(pieces==0)
+	{
+	  solution[i++]='d';
+	  solution[i++]='f';
+	  solution[i++]='r';
+	}
+	else
+	{
+	  solution[i++]='r';
+	  solution[i++]='D';
+	  solution[i++]='b';
+	  solution[i++]='d';
+	}
+      }
+      pieces++;
+      last=i;
+      for(j=start;j<last;j++)
+      {
+	move(solution[j]);
+      }
+      start=last;
+      if(pieces>=4) break;
+      continue;
+    }
+
+
+    //white on red side
+    if(faces[5][1]=='w')
+    {
+      if(faces[0][3]=='r')
+      {
+	if(faces[1][7]!='w')
+	{
+	  solution[i++]='U';
+	  solution[i++]='B';
+	  solution[i++]='l';
+	}
+	else if(faces[1][1]!='w')
+	{
+	  solution[i++]='u';
+	  solution[i++]='f';
+	  solution[i++]='L';
+	}
+	else
+	{
+	  solution[i++]='F';
+	  solution[i++]='u';
+	  solution[i++]='f';
+	  solution[i++]='L';
+	}
+      }
+      else if(faces[0][3]=='o')
+      {
+	if(faces[1][1]!='w')
+	{
+	  solution[i++]='u';
+	  solution[i++]='F';
+	  solution[i++]='r';
+	}
+	else if(faces[1][7]!='w')
+	{
+	  solution[i++]='U';
+	  solution[i++]='b';
+	  solution[i++]='R';
+	}
+	else
+	{
+	  solution[i++]='u';
+	  solution[i++]='F';
+	  solution[i++]='r';
+	  solution[i++]='f';
+	}
+      }
+      else if(faces[0][3]=='g')
+      {
+	if(faces[1][3]!='w')
+	{
+	  solution[i++]='L';
+	  solution[i++]='f';
+	}
+	else
+	{
+	  solution[i++]='L';
+	  solution[i++]='f';
+	  solution[i++]='l';
+	}
+      }
+      else if(faces[0][3]=='b')
+      {
+	if(faces[1][3]!='w')
+	{
+	  solution[i++]='l';
+	  solution[i++]='B';
+	}
+	else
+	{
+	  solution[i++]='l';
+	  solution[i++]='B';
+	  solution[i++]='L';
+	}
+      }
+      pieces++;
+      last=i;
+      for(j=start;j<last;j++)
+      {
+	move(solution[j]);
+      }
+      start=last;
+      if(pieces>=4) break;
+      continue;
+    }
+    if(faces[5][3]=='w')
+    {
+      if(faces[2][5]=='r')
+      {
+	if(pieces==0)
+	{
+	  solution[i++]='B';
+	  solution[i++]='D';
+	}
+	else
+	{
+	  solution[i++]='d';
+	  solution[i++]='B';
+	  solution[i++]='D';
+	}
+      }
+      else if(faces[2][5]=='o')
+      {
+	if(faces[1][7]!='w')
+	{
+	  solution[i++]='b';
+	  solution[i++]='U';
+	  solution[i++]='R';
+	  solution[i++]='R';
+	}
+	else
+	{
+	  solution[i++]='b';
+	  solution[i++]='U';
+	  solution[i++]='R';
+	  solution[i++]='R';
+	  solution[i++]='B';
+	}
+      }
+      else if(faces[2][5]=='g')
+      {
+	if(faces[1][3]!='w')
+	{
+	  solution[i++]='L';
+	  solution[i++]='L';
+	  solution[i++]='f';
+	}
+	else
+	{
+	  solution[i++]='L';
+	  solution[i++]='L';
+	  solution[i++]='f';
+	  solution[i++]='L';
+	  solution[i++]='L';
+	}
+      }
+      else if(faces[2][5]=='b')
+      {
+	solution[i++]='B';
+      }
+      pieces++;
+      last=i;
+      for(j=start;j<last;j++)
+      {
+	move(solution[j]);
+      }
+      start=last;
+      if(pieces>=4) break;
+      continue;
+    }
+    if(faces[5][5]=='w')
+    {
+      if(faces[3][3]=='r')
+      {
+	if(pieces==0)
+	{
+	  solution[i++]='f';
+	  solution[i++]='d';
+	}
+	else
+	{
+	  solution[i++]='D';
+	  solution[i++]='f';
+	  solution[i++]='d';
+	}
+      }
+      else if(faces[3][3]=='o')
+      {
+	if(pieces==0)
+	{
+	  solution[i++]='f';
+	  solution[i++]='D';
+	}
+	else
+	{
+	  solution[i++]='d';
+	  solution[i++]='f';
+	  solution[i++]='D';
+	}
+      }
+      else if(faces[3][3]=='b')
+      {
+	if(faces[1][3]!='w')
+	{
+	  solution[i++]='L';
+	  solution[i++]='L';
+	  solution[i++]='B';
+	}
+	else
+	{
+	  solution[i++]='L';
+	  solution[i++]='L';
+	  solution[i++]='B';
+	  solution[i++]='L';
+	  solution[i++]='L';
+	}
+      }
+      else if(faces[3][3]=='g')
+      {
+	solution[i++]='f';
+      }
+      pieces++;
+      last=i;
+      for(j=start;j<last;j++)
+      {
+	move(solution[j]);
+      }
+      start=last;
+      if(pieces>=4) break;
+      continue;
+    }
+    if(faces[5][7]=='w')
+    {
+      if(faces[1][3]=='r')
+      {
+	if(pieces==0)
+	{
+	  solution[i++]='D';
+	  solution[i++]='F';
+	  solution[i++]='L';
+	}
+	else
+	{
+	  solution[i++]='D';
+	  solution[i++]='F';
+	  solution[i++]='d';
+	  solution[i++]='L';
+	}
+      }
+      else if(faces[1][3]=='o')
+      {
+	if(pieces==0)
+	{
+	  solution[i++]='D';
+	  solution[i++]='f';
+	  solution[i++]='r';
+	}
+	else
+	{
+	  solution[i++]='l';
+	  solution[i++]='d';
+	  solution[i++]='f';
+	  solution[i++]='D';
+	}
+      }
+      else if(faces[1][3]=='b')
+      {
+	solution[i++]='L';
+	solution[i++]='B';
+      }
+      else if(faces[1][3]=='g')
+      {
+	solution[i++]='l';
+	solution[i++]='f';
+      }
+      pieces++;
+      last=i;
+      for(j=start;j<last;j++)
+      {
+	move(solution[j]);
+      }
+      start=last;
+      if(pieces>=4) break;
+      continue;
+    }
+
+    //cross piece on white side
+
+    if(faces[1][7]=='w')
+    {
+	if(faces[2][7]=='g')
+	{
+	  if(pieces==0)
+	  {
+	    solution[i++]='D';
+	    solution[i++]='D';
+	  }
+	  else
+	  {
+	    solution[i++]='B';
+	    solution[i++]='B';
+	    solution[i++]='U';
+	    solution[i++]='U';
+	    solution[i++]='F';
+	    solution[i++]='F';
+	  }
+	}
+	else if(faces[2][7]=='b' && flagB!=1)
+	{
+	  flagB++;
+	}
+	else if(faces[2][7]=='r')
+	{
+	  if(pieces==0)
+	  solution[i++]='D';
+	  else
+	  {
+	    solution[i++]='B';
+	    solution[i++]='B';
+	    solution[i++]='u';
+	    solution[i++]='L';
+	    solution[i++]='L';
+	  }
+	}
+	else if(faces[2][7]=='o')
+	{
+	  if(pieces==0)
+	  solution[i++]='d';
+	  else
+	  {
+	    solution[i++]='B';
+	    solution[i++]='B';
+	    solution[i++]='U';
+	    solution[i++]='R';
+	    solution[i++]='R';
+	  }
+	}
+
+	pieces++;
+	last=i;
+	for(j=start;j<last;j++)
+	{
+	  move(solution[j]);
+	}
+	start=last;
+	if(pieces>=4) break;
+	continue;
+    }
+    if(faces[1][3]=='w')
+    {
+      if(faces[5][7]=='o')
+      {
+	if(pieces==0)
+	{
+	  solution[i++]='D';
+	  solution[i++]='D';
+	}
+	else
+	{
+	  solution[i++]='L';
+	  solution[i++]='L';
+	  solution[i++]='U';
+          solution[i++]='U';
+          solution[i++]='R';
+	  solution[i++]='R';
+        }
+      }
+      else if(faces[5][7]=='r' && flagR!=1)
+      {
+        flagR++;
+      }
+      else if(faces[5][7]=='g')
+      {
+	if(pieces==0)
+	  solution[i++]='D';
+        else
+        {
+	  solution[i++]='L';
+          solution[i++]='L';
+	  solution[i++]='u';
+          solution[i++]='F';
+	  solution[i++]='F';
+        }
+      }
+      else if(faces[5][7]=='b')
+      {
+	if(pieces==0)
+	  solution[i++]='d';
+        else
+        {
+	  solution[i++]='L';
+          solution[i++]='L';
+	  solution[i++]='U';
+          solution[i++]='B';
+	  solution[i++]='B';
+        }
+      }
+      pieces++;
+      last=i;
+      for(j=start;j<last;j++)
+      {
+        move(solution[j]);
+      }
+      start=last;
+      if(pieces>=4) break;
+      continue;
+    }
+    if(faces[1][5]=='w')
+    {
+      if(faces[4][7]=='r')
+      {
+        if(pieces==0)
+	{
+	  solution[i++]='D';
+          solution[i++]='D';
+        }
+	else
+        {
+	  solution[i++]='R';
+          solution[i++]='R';
+	  solution[i++]='U';
+          solution[i++]='U';
+          solution[i++]='L';
+          solution[i++]='L';
+        }
+      }
+      else if(faces[4][7]=='o' && flagO!=1)
+      {
+        flagO++;
+      }
+      else if(faces[4][7]=='b')
+      {
+        if(pieces==0)
+	  solution[i++]='D';
+        else
+        {
+          solution[i++]='R';
+          solution[i++]='R';
+	  solution[i++]='u';
+	  solution[i++]='B';
+          solution[i++]='B';
+        }
+      }
+      else if(faces[4][7]=='g')
+      {
+        if(pieces==0)
+	solution[i++]='d';
+        else
+        {
+          solution[i++]='R';
+          solution[i++]='R';
+	  solution[i++]='U';
+	  solution[i++]='F';
+          solution[i++]='F';
+        }
+      }
+      pieces++;
+      last=i;
+      for(j=start;j<last;j++)
+      {
+	move(solution[j]);
+      }
+      start=last;
+      if(pieces>=4) break;
+      continue;
+    }
+    if(faces[1][1]=='w' && faces[3][7]!='b')
+    {
+      if(faces[3][7]=='g')
+      {
+	if(pieces==0)
+	{
+	  solution[i++]='D';
+	  solution[i++]='D';
+	}
+	else
+	{
+	  solution[i++]='B';
+	  solution[i++]='B';
+	  solution[i++]='U';
+	  solution[i++]='U';
+	  solution[i++]='F';
+	  solution[i++]='F';
+	}
+      }
+      else if(faces[3][7]=='o')
+      {
+	if(pieces==0)
+	  solution[i++]='d';
+	else
+	{
+	  solution[i++]='B';
+	  solution[i++]='B';
+	  solution[i++]='U';
+	  solution[i++]='R';
+	  solution[i++]='R';
+	}
+      }
+      else if(faces[3][7]=='r')
+      {
+	if(pieces==0)
+	solution[i++]='D';
+	else
+	{
+	  solution[i++]='B';
+	  solution[i++]='B';
+	  solution[i++]='u';
+	  solution[i++]='L';
+	  solution[i++]='L';
+	}
+      }
+      pieces++;
+      last=i;
+      for(j=start;j<last;j++)
+      {
+	move(solution[j]);
+      }
+      start=last;
+      if(pieces>=4) break;
+      continue;
+    }
+  }
+}
+
+
+int main()
+{
+  clrscr();
+  Solvedstate();
+  scramble();
+  disp_scramble();
+  Cross();
+  cout<<"\nCross solution:";
+  write_solution();
+  disp_file();
+  //remove("Scramble.txt");
+  //remove("Solution.txt");
+  return 0;
+}
+
